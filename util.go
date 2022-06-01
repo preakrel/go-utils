@@ -619,90 +619,81 @@ func Recast(s string, r bool) interface{} {
 	return interface{}(s)
 }
 
-//OriginalHttpBuildQuery
-func OriginalHttpBuildQuery(data map[string]interface{}, keys ...string) string {
-	key := ""
-	for _, k := range keys {
-		key = k
-	}
-
-	paramsArr := make([]string, 0, len(data))
-	for k, v := range data {
-		if key != "" {
-			k = "[" + k + "]"
+//      note 1: If the value is null, key and value are skipped in the
+//      note 1: HTTPBuildQuery of PHP while in locutus they are not.
+//   example 1: HTTPBuildQuery({foo: 'bar', php: 'hypertext processor', baz: 'boom', cow: 'milk'}, '', '&amp;')
+//   returns 1: 'foo=bar&amp;php=hypertext+processor&amp;baz=boom&amp;cow=milk'
+//   example 2: HTTPBuildQuery({'php': 'hypertext processor', 0: 'foo', 1: 'bar', 2: 'baz', 3: 'boom', 'cow': 'milk'}, 'myvar_')
+//   returns 2: 'myvar_0=foo&myvar_1=bar&myvar_2=baz&myvar_3=boom&php=hypertext+processor&cow=milk'
+//   example 3: HTTPBuildQuery({foo: 'bar', php: 'hypertext processor', baz: 'boom', cow: 'milk'}, '', '&amp;', 'PHP_QUERY_RFC3986')
+//   returns 3: 'foo=bar&amp;php=hypertext%20processor&amp;baz=boom&amp;cow=milk'
+//HTTPBuildQuery
+func HTTPBuildQuery(formdata map[string]interface{}, opts ...string) string {
+	numericPrefix, argSeparator, encType := "", "&", "PHP_QUERY_RFC3986"
+	rawurldecode := func(str string) string {
+		s, err := url.QueryUnescape(strings.Replace(str, "%20", "+", -1))
+		if err != nil {
+			return str
 		}
-		switch v := v.(type) {
-		case string, uint, int, uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float64:
-			paramsArr = append(paramsArr, fmt.Sprintf("%s%s=%v", key, k, v))
-		case map[string]string:
-			for ks, s := range v {
-				paramsArr = append(paramsArr, fmt.Sprintf("%s%s[%s]=%v", key, k, ks, s))
-			}
-		case []string:
-			for _, s := range v {
-				paramsArr = append(paramsArr, fmt.Sprintf("%s%s[]=%v", key, k, s))
-			}
-		case []float64:
-			for _, s := range v {
-				paramsArr = append(paramsArr, fmt.Sprintf("%s%s[]=%v", key, k, s))
-			}
-		default:
-			bt, _ := json.Marshal(v)
-			var iData interface{}
-			_ = json.Unmarshal(bt, &iData)
-
-			if iv, ok := iData.([]interface{}); ok {
-				for i, i2 := range iv {
-					switch i2.(type) {
-					case string:
-						paramsArr = append(paramsArr, fmt.Sprintf("%s%s[]=%v", key, k, i2))
-					case float64:
-						paramsArr = append(paramsArr, fmt.Sprintf("%s%s[]=%v", key, k, i2))
-					default:
-						vk := key + k + "[" + strconv.Itoa(i) + "]"
-						paramsArr = append(paramsArr, OriginalHttpBuildQuery(i2.(map[string]interface{}), vk))
-					}
-				}
-			} else if im, ok := iData.(map[string]interface{}); ok {
-				for ik, i2 := range im {
-					switch i2.(type) {
-					case string:
-						paramsArr = append(paramsArr, fmt.Sprintf("%s%s[%v]=%v", key, k, ik, i2))
-					case float64:
-						paramsArr = append(paramsArr, fmt.Sprintf("%s%s[%v]=%v", key, k, ik, i2))
-					case []interface{}:
-						vk := key + k + "[" + ik + "]"
-						for k3, v3 := range i2.([]interface{}) {
-							switch v3.(type) {
-							case string:
-								paramsArr = append(paramsArr, fmt.Sprintf("%s%s[%v]=%v", key, vk, k3, v3))
-							case float64:
-								paramsArr = append(paramsArr, fmt.Sprintf("%s%s[%v]=%v", key, vk, k3, v3))
-							default:
-								if key != "" {
-									k = key + k
-								}
-								paramsArr = append(paramsArr, OriginalHttpBuildQuery(v3.(map[string]interface{}), k))
-							}
-						}
-					default:
-						i2Data := i2.(map[string]interface{})
-						nk := k + "[" + ik + "]"
-						for _, v := range i2Data {
-							switch v.(type) {
-							case string, int:
-							default:
-								nk = key + k + "[" + ik + "]"
-							}
-
-						}
-						paramsArr = append(paramsArr, OriginalHttpBuildQuery(i2Data, nk))
-					}
-				}
-			}
+		return s
+	}
+	urlencode := func(str string) string { return url.QueryEscape(str) }
+	var encodeFunc func(string) string = urlencode
+	for k, v := range opts {
+		switch k {
+		case 0:
+			numericPrefix = v
+		case 1:
+			argSeparator = v
+		case 2:
+			encType = v
 		}
 	}
-	return strings.Join(paramsArr, "&")
+	if encType == "PHP_QUERY_RFC3986" {
+		encodeFunc = rawurldecode
+	}
+	var _httpBuildQueryHelper func(string, interface{}, string) string
+	_httpBuildQueryHelper = func(key string, data interface{}, argSeparator string) string {
+		if data != nil {
+			val := reflect.ValueOf(data)
+			if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+				tmp := make([]string, 0, val.Len())
+				for i := 0; i < val.Len(); i++ {
+					tmp = append(tmp, _httpBuildQueryHelper(key+"["+strconv.Itoa(i)+"]", val.Index(i).Interface(), argSeparator))
+				}
+				return strings.Join(tmp, argSeparator)
+			} else if val.Kind() == reflect.Map {
+				tmp := make([]string, 0, val.Len())
+				for _, vk := range val.MapKeys() {
+					tmp = append(tmp, _httpBuildQueryHelper(key+"["+vk.String()+"]", val.MapIndex(vk).Interface(), argSeparator))
+				}
+				return strings.Join(tmp, argSeparator)
+			} else if val.Kind() != reflect.Func {
+				return encodeFunc(key) + "=" + encodeFunc(fmt.Sprint(val.Interface()))
+			} else {
+				panic("There was an error processing for http_build_query().")
+			}
+
+		}
+		return ""
+	}
+	if argSeparator == "" {
+		argSeparator = "&"
+	}
+	tmp := make([]string, 0, len(formdata))
+	for key, val := range formdata {
+		if numericPrefix != "" && key != "" {
+			if _, err := strconv.ParseFloat(key, 64); err != nil {
+				key = numericPrefix + key
+			}
+		}
+		query := _httpBuildQueryHelper(key, val, argSeparator)
+		if query != "" {
+			tmp = append(tmp, query)
+		}
+
+	}
+	return strings.Join(tmp, argSeparator)
 }
 
 // NumberFormat number_format()
@@ -1340,11 +1331,6 @@ func Rawurlencode(str string) string {
 // Rawurldecode rawurldecode()
 func Rawurldecode(str string) (string, error) {
 	return url.QueryUnescape(strings.Replace(str, "%20", "+", -1))
-}
-
-// HTTPBuildQuery http_build_query()
-func HTTPBuildQuery(queryData url.Values) string {
-	return queryData.Encode()
 }
 
 // Base64Encode base64_encode()
