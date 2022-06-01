@@ -629,7 +629,7 @@ func Recast(s string, r bool) interface{} {
 //   returns 3: 'foo=bar&amp;php=hypertext%20processor&amp;baz=boom&amp;cow=milk'
 //HTTPBuildQuery
 func HTTPBuildQuery(formdata map[string]interface{}, opts ...string) string {
-	numericPrefix, argSeparator, encType := "", "&", "PHP_QUERY_RFC3986"
+	numericPrefix, argSeparator, encType := "", "&", "QUERY_RFC1738"
 	rawurldecode := func(str string) string {
 		s, err := url.QueryUnescape(strings.Replace(str, "%20", "+", -1))
 		if err != nil {
@@ -639,6 +639,7 @@ func HTTPBuildQuery(formdata map[string]interface{}, opts ...string) string {
 	}
 	urlencode := func(str string) string { return url.QueryEscape(str) }
 	var encodeFunc func(string) string = urlencode
+
 	for k, v := range opts {
 		switch k {
 		case 0:
@@ -649,7 +650,7 @@ func HTTPBuildQuery(formdata map[string]interface{}, opts ...string) string {
 			encType = v
 		}
 	}
-	if encType == "PHP_QUERY_RFC3986" {
+	if encType == "QUERY_RFC3986" {
 		encodeFunc = rawurldecode
 	}
 	var _httpBuildQueryHelper func(string, interface{}, string) string

@@ -29,7 +29,7 @@ func TestOriginalHttpBuildQuery(t *testing.T) {
 		t.Log(err)
 	}
 	fmt.Println(r)
-	str := HTTPBuildQuery(r, "", "", "PHP_QUERY_RFC1738")
+	str := HTTPBuildQuery(r, "", "", "")
 
 	t.Log(str)
 
