@@ -16,7 +16,11 @@ func TestXml(t *testing.T) {
     <item>b</item>
     <item>c</item>
     <item>
-      <item>d</item>
+      <item>
+	     <item>
+		  <item>d</item>
+		 </item> 
+	  </item>
     </item>
   </poc>
 </xml>`

@@ -416,18 +416,19 @@ func handleXmlChildren(e *xml.Encoder, fieldName string, v interface{}, cdata bo
 					val = ""
 				}
 				// fmt.Println("old", reflect.TypeOf(val), val)
-				if reflect.TypeOf(val).Kind() == reflect.Map {
+				data := reflect.ValueOf(val)
+				if data.Kind() == reflect.Map {
 					//EncodeToken  一个外层标签
 					e.EncodeToken(xml.StartElement{Name: xml.Name{Local: childKey}})
-
-					for mk, vd := range val.(map[string]interface{}) {
-						kind := reflect.TypeOf(vd).Kind()
-						if kind == reflect.Slice {
-							for _, elem := range vd.([]interface{}) {
-								handleXmlChildren(e, mk, elem, cdata)
+					for _, mk := range data.MapKeys() {
+						vd := data.MapIndex(mk).Interface()
+						val := reflect.ValueOf(vd)
+						if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+							for i := 0; i < val.Len(); i++ {
+								handleXmlChildren(e, mk.String(), val.Index(i).Interface(), cdata)
 							}
 						} else {
-							handleXmlChildren(e, mk, vd, cdata)
+							handleXmlChildren(e, mk.String(), vd, cdata)
 						}
 					}
 					e.EncodeToken(xml.EndElement{Name: xml.Name{Local: childKey}})

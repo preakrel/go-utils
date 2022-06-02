@@ -1,13 +1,14 @@
 package util
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"testing"
 )
 
 func TestParseStr(t *testing.T) {
-	result, err := ParseStr(`id=187923&po1c[0]=1&po1c[1][0]=3&po1c[1][1][0]=5&po1c[1][1][1]=6&po1c[1][2]=4&po1c[2]=2&poc=true&test=abc`)
+	result, err := ParseStr(`poc=true&list[0]=1&list[1]=2&list[2][0]=3&list[2][1]=4&list[2][2][0]=5&list[2][2][1]=6&list[2][2][2][0]=7&list[2][2][2][1]=8&list[2][2][2][2][0]=9&list[2][2][2][2][1]=10&list[2][2][2][2][2][0]=11&list[2][2][2][2][2][1]=12&list[2][2][2][2][2][2][0]=13&list[2][2][2][2][2][2][1]=14&id=187923`)
 
 	if err != nil {
 		t.Log(err)
@@ -22,14 +23,17 @@ func TestParseStr(t *testing.T) {
 }
 func TestOriginalHttpBuildQuery(t *testing.T) {
 
-	jsonStr := `{"id":187923,"po1c":[1,[3,[5,6],4],2],"poc":true,"test[0][1]":"2","test[0][3]":"12"}`
+	jsonStr := `{"id":187923,"poc":true,"list":[1,2,[3,4,[5,6,[7,8,[9,10,[11,12,[13,14]]]]]]],"map":{"m1":"k1","m2":"k2"}}`
 	var r map[string]interface{}
-	err := json.Unmarshal([]byte(jsonStr), &r)
+	d := json.NewDecoder(bytes.NewReader([]byte(jsonStr)))
+	d.UseNumber()
+	err := d.Decode(&r)
+
 	if err != nil {
 		t.Log(err)
 	}
 	fmt.Println(r)
-	str := HTTPBuildQuery(r, "", "", "")
+	str := HTTPBuildQuery(r, "", "&", "QUERY_RFC3986")
 
 	t.Log(str)
 
