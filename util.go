@@ -5255,6 +5255,30 @@ func RandPassword(length int) string {
 	return str
 }
 
+//StrToUnicode 字符串转unicode编码
+func StrToUnicode(str string) string {
+	finallStr := ""
+	for _, s := range str {
+		if unicode.Is(unicode.Han, s) {
+			textQuoted := strconv.QuoteToASCII(string(s))
+			finallStr += textQuoted[1 : len(textQuoted)-1]
+		} else {
+			h := fmt.Sprintf("%x", s)
+			finallStr += "\\u" + fmt.Sprintf("%0*s", 4, h)
+		}
+	}
+	return finallStr
+}
+
+//UnicodeToStr unicode编码转字符串
+func UnicodeToStr(uStr string) string {
+	uqStr, err := strconv.Unquote(strings.Replace(strconv.Quote(uStr), `\\u`, `\u`, -1))
+	if err != nil {
+		return ""
+	}
+	return uqStr
+}
+
 var MobilePrefix = [...]string{
 	"130",
 	"131",

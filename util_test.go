@@ -38,3 +38,12 @@ func TestOriginalHttpBuildQuery(t *testing.T) {
 	t.Log(str)
 
 }
+func TestStrToUnicode(t *testing.T) {
+
+	str := "hello word, 世界, $123"
+	uStr := StrToUnicode(str)
+	t.Log("uStr==>", uStr)
+
+	t.Log("str==>", UnicodeToStr(uStr))
+
+}
