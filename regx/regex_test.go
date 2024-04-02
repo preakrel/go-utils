@@ -1,7 +1,7 @@
 package regx
 
 import (
-	"io/ioutil"
+	"io"
 	"mime/multipart"
 	"strings"
 	"testing"
@@ -84,7 +84,7 @@ Content-Disposition: form-data; name="result"
 			return
 		}
 		t.Log(part.FormName())
-		b, e := ioutil.ReadAll(part)
+		b, e := io.ReadAll(part)
 		t.Log(string(b), e)
 	}
 }

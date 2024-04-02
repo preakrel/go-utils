@@ -4,13 +4,17 @@ go 1.18
 
 require (
 	github.com/dlclark/regexp2 v1.4.0
+	github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f
+	github.com/google/btree v1.1.2
 	github.com/google/uuid v1.3.0
 	github.com/mozillazg/go-pinyin v0.19.0
 	github.com/pkg/errors v0.9.1
 	github.com/tealeg/xlsx v1.0.5
 	go.mongodb.org/mongo-driver v1.9.1
 	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
+	golang.org/x/sys v0.0.0-20191026070338-33540a1f6037
 	golang.org/x/text v0.3.5
+	gopkg.in/iconv.v1 v1.1.1
 )
 
 require (

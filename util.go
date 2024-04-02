@@ -102,10 +102,10 @@ var tagPatterns = []string{
 
 var errNegativeNotAllowed = errors.New("unable to cast negative value")
 
-//timeZone 默认时区
+// timeZone 默认时区
 var timeZone *time.Location
 
-//DateTimeParse 时间解析
+// DateTimeParse 时间解析
 func DateTimeParse(st string) (int, error) {
 	var h, m, s int
 	n, err := fmt.Sscanf(st, "%d:%d:%d", &h, &m, &s)
@@ -115,7 +115,7 @@ func DateTimeParse(st string) (int, error) {
 	return h*3600 + m*60 + s, nil
 }
 
-//FormatDuring 格式化秒
+// FormatDuring 格式化秒
 func FormatDuring(t time.Time) string {
 	const (
 		Decisecond = 100 * time.Millisecond
@@ -140,7 +140,7 @@ func FormatDuring(t time.Time) string {
 	return fmt.Sprintf("%d天%d小时%d分钟%d.%d秒", d, h, m, s, f)
 }
 
-//GetHourDiffer 获取相差时间
+// GetHourDiffer 获取相差时间
 func GetHourDiffer(startTime, endTime interface{}) int64 {
 	var s int64
 	t1 := ToTime(startTime)
@@ -154,7 +154,7 @@ func GetHourDiffer(startTime, endTime interface{}) int64 {
 	}
 }
 
-//GetTimeZone 获取时区
+// GetTimeZone 获取时区
 func GetTimeZone() *time.Location {
 	if timeZone == nil {
 		timeZone, _ = time.LoadLocation("Local")
@@ -162,7 +162,7 @@ func GetTimeZone() *time.Location {
 	return timeZone
 }
 
-//SetTimeZone 设置时区
+// SetTimeZone 设置时区
 func SetTimeZone(zone string) *time.Location {
 	//loc, err := time.LoadLocation("Asia/Shanghai")
 	timeZone, _ = time.LoadLocation(zone)
@@ -184,7 +184,7 @@ func Now() time.Time {
 	return time.Now().In(cstZone)
 }
 
-//Timestamp 毫秒
+// Timestamp 毫秒
 func Timestamp() int64 {
 	cstZone := GetTimeZone()
 	return time.Now().In(cstZone).UnixNano() / int64(time.Millisecond)
@@ -619,15 +619,16 @@ func Recast(s string, r bool) interface{} {
 	return interface{}(s)
 }
 
-//      note 1: If the value is null, key and value are skipped in the
-//      note 1: HTTPBuildQuery of PHP while in locutus they are not.
-//   example 1: HTTPBuildQuery({foo: 'bar', php: 'hypertext processor', baz: 'boom', cow: 'milk'}, '', '&amp;')
-//   returns 1: 'foo=bar&amp;php=hypertext+processor&amp;baz=boom&amp;cow=milk'
-//   example 2: HTTPBuildQuery({'php': 'hypertext processor', 0: 'foo', 1: 'bar', 2: 'baz', 3: 'boom', 'cow': 'milk'}, 'myvar_')
-//   returns 2: 'myvar_0=foo&myvar_1=bar&myvar_2=baz&myvar_3=boom&php=hypertext+processor&cow=milk'
-//   example 3: HTTPBuildQuery({foo: 'bar', php: 'hypertext processor', baz: 'boom', cow: 'milk'}, '', '&amp;', 'PHP_QUERY_RFC3986')
-//   returns 3: 'foo=bar&amp;php=hypertext%20processor&amp;baz=boom&amp;cow=milk'
-//HTTPBuildQuery
+//	   note 1: If the value is null, key and value are skipped in the
+//	   note 1: HTTPBuildQuery of PHP while in locutus they are not.
+//	example 1: HTTPBuildQuery({foo: 'bar', php: 'hypertext processor', baz: 'boom', cow: 'milk'}, '', '&amp;')
+//	returns 1: 'foo=bar&amp;php=hypertext+processor&amp;baz=boom&amp;cow=milk'
+//	example 2: HTTPBuildQuery({'php': 'hypertext processor', 0: 'foo', 1: 'bar', 2: 'baz', 3: 'boom', 'cow': 'milk'}, 'myvar_')
+//	returns 2: 'myvar_0=foo&myvar_1=bar&myvar_2=baz&myvar_3=boom&php=hypertext+processor&cow=milk'
+//	example 3: HTTPBuildQuery({foo: 'bar', php: 'hypertext processor', baz: 'boom', cow: 'milk'}, '', '&amp;', 'PHP_QUERY_RFC3986')
+//	returns 3: 'foo=bar&amp;php=hypertext%20processor&amp;baz=boom&amp;cow=milk'
+//
+// HTTPBuildQuery
 func HTTPBuildQuery(formdata map[string]interface{}, opts ...string) string {
 	numericPrefix, argSeparator, encType := "", "&", "QUERY_RFC1738"
 	rawurldecode := func(str string) string {
@@ -826,7 +827,7 @@ func Strlen(str string) int {
 	return len(str)
 }
 
-//StrLastChar 删除最后一个
+// StrLastChar 删除最后一个
 func StrLastChar(s string) string {
 	r, size := utf8.DecodeLastRuneInString(s)
 	if r == utf8.RuneError && (size == 0 || size == 1) {
@@ -942,7 +943,7 @@ func Trim(str string, characterMask ...string) string {
 	return strings.Trim(str, characterMask[0])
 }
 
-//StrTrim 去除空格
+// StrTrim 去除空格
 func StrTrim(str string) string {
 	return strings.TrimSpace(str)
 }
@@ -1471,7 +1472,7 @@ func ArrayRand(elements []interface{}) []interface{} {
 	return n
 }
 
-//ArrayRandMap 随即
+// ArrayRandMap 随即
 func ArrayRandMap(elements []map[string]string) []map[string]string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	n := make([]map[string]string, len(elements))
@@ -1620,7 +1621,7 @@ func InMultiArray(haystack interface{}, needle ...interface{}) bool {
 	return false
 }
 
-//判断二维数组里面是不是只有一条数据
+// 判断二维数组里面是不是只有一条数据
 func MultiArray(haystack interface{}) bool {
 	val := reflect.ValueOf(haystack)
 	switch val.Kind() {
@@ -1931,7 +1932,7 @@ func Mkdir(filename string, mode os.FileMode) error {
 	return os.Mkdir(filename, mode)
 }
 
-//MkdirAll 创建文件夹
+// MkdirAll 创建文件夹
 func MkdirAll(filename string, mode os.FileMode) error {
 	return os.MkdirAll(filename, mode)
 }
@@ -2083,8 +2084,9 @@ func IsNumeric(val interface{}) bool {
 // returnVar, 0: succ; 1: fail
 // Return the last line from the result of the command.
 // command format eg:
-//   "ls -a"
-//   "/bin/bash -c \"ls -a\""
+//
+//	"ls -a"
+//	"/bin/bash -c \"ls -a\""
 func Exec(command string, output *[]string, returnVar *int) string {
 	q := rune(0)
 	parts := strings.FieldsFunc(command, func(r rune) bool {
@@ -2588,7 +2590,7 @@ func Ternary(condition bool, trueVal, falseVal interface{}) interface{} {
 	return falseVal
 }
 
-//StrToInt 字符串换数字
+// StrToInt 字符串换数字
 func StrToInt(str string, val int) int {
 	num, err := strconv.Atoi(str)
 	if err != nil {
@@ -2620,7 +2622,7 @@ func FormatDate(str interface{}) string {
 	return Date("Y-m-d", ToTime(str))
 }
 
-//ZhCharToFirstPinyin 将中文转换成小写字母
+// ZhCharToFirstPinyin 将中文转换成小写字母
 func ZhCharToFirstPinyin(p string) string {
 	var a = pinyin.NewArgs()
 	var s string
@@ -2635,7 +2637,7 @@ func ZhCharToFirstPinyin(p string) string {
 	return StrToLower(s)
 }
 
-//ZhCharToPinyin 将中文转换成小写字母
+// ZhCharToPinyin 将中文转换成小写字母
 func ZhCharToPinyin(p string) string {
 	var a = pinyin.NewArgs()
 	var s string
@@ -2657,7 +2659,7 @@ func InterfaceToString(data []interface{}) (s []string) {
 	return s
 }
 
-//分割字符串 p 字符串, split 分隔符 , space 是否需要保留文字中的空格
+// 分割字符串 p 字符串, split 分隔符 , space 是否需要保留文字中的空格
 func SplitString(p, split string, space bool) string {
 	var res string
 	for _, c := range p {
@@ -2701,7 +2703,7 @@ func ArrayPluck(data []map[string]string, value string) []string {
 	return res
 }
 
-//ArrayRemoveRepeatedElement 数组去重
+// ArrayRemoveRepeatedElement 数组去重
 func ArrayRemoveRepeatedElement(arr []string) (newArr []string) {
 	newArr = make([]string, 0)
 	for i := 0; i < len(arr); i++ {
@@ -4189,7 +4191,7 @@ func AryInterfaceToArgString(d []interface{}) []string {
 	return data
 }
 
-//查询是否被整除
+// 查询是否被整除
 func Divide(m, n interface{}) bool {
 	r := math.Mod(ToFloat64(m), ToFloat64(n))
 	if r == 0 {
@@ -4282,7 +4284,7 @@ func fromYearWeek(year int, month time.Month, day int) (wyear, week int) {
 	return year, week
 }
 
-//NextMonthDate 获取当前日期的下个月的第一天和最后一天
+// NextMonthDate 获取当前日期的下个月的第一天和最后一天
 func NextMonthDate(d string) (string, string) {
 	now := ToTime(d)
 	var nextMonth int
@@ -4305,7 +4307,7 @@ func NextMonthDate(d string) (string, string) {
 	return Date("Y-m-d", firstDate), Date("Y-m-d", lastDate)
 }
 
-//NextMonthDate 获取当前日期的上个月的第一天和最后一天
+// NextMonthDate 获取当前日期的上个月的第一天和最后一天
 func PrevMonthDate(d string) (string, string) {
 	now := ToTime(d)
 	var prevMonth int
@@ -4352,7 +4354,7 @@ func Pipeline(str string) mongo.Pipeline {
 	return pipeline
 }
 
-//MonthDate 获取当前日期的当月的第一天和最后一天
+// MonthDate 获取当前日期的当月的第一天和最后一天
 func MonthDate(d string) (string, string) {
 	now := ToTime(d)
 	year, month, _ := now.Date()
@@ -4362,7 +4364,7 @@ func MonthDate(d string) (string, string) {
 	return Date("Y-m-d", firstDate), Date("Y-m-d", lastDate)
 }
 
-//Month 获取当前月份前一年的月份 d Y-m-d
+// Month 获取当前月份前一年的月份 d Y-m-d
 func Month(d string) ([]string, []int64) {
 	now := ToTime(d)
 	prevTime := now.AddDate(-1, 1, 0)
@@ -4380,7 +4382,7 @@ func Month(d string) ([]string, []int64) {
 	return res, resInt64
 }
 
-//Day 获取起止日期中的天 s,e Y-m-d
+// Day 获取起止日期中的天 s,e Y-m-d
 func Day(s string, e string) ([]string, []int64) {
 	start := ToTime(s)
 	end := ToTime(e)
@@ -4403,7 +4405,7 @@ func Day(s string, e string) ([]string, []int64) {
 	return res, resInt64
 }
 
-//Day 获取起止日期中的小时 YmdH
+// Day 获取起止日期中的小时 YmdH
 func Hour(s string, e string) ([]string, []int64) {
 	start := ToTime(s)
 	end := ToTime(e)
@@ -4421,7 +4423,7 @@ func Hour(s string, e string) ([]string, []int64) {
 	return res, resInt64
 }
 
-//ConvertBson 构建 bson.D 查询数据
+// ConvertBson 构建 bson.D 查询数据
 func ConvertBson(items bson.D, item bson.E) bson.D {
 	key := make([]string, 0)
 	for _, v := range items {
@@ -4449,7 +4451,7 @@ func ConvertBson(items bson.D, item bson.E) bson.D {
 	return items
 }
 
-//StrPad 填充字符串
+// StrPad 填充字符串
 func StrPad(str1, str2 string, i int) string {
 	n := i - len(str1) - len(str2)
 	if n > 0 {
@@ -4460,7 +4462,7 @@ func StrPad(str1, str2 string, i int) string {
 	return str1 + str2
 }
 
-//DebugFormat debug
+// DebugFormat debug
 func DebugFormat(i interface{}) string {
 	s := ToString(i)
 	res := "Unknown"
@@ -4507,7 +4509,7 @@ func ToWeekDay(t interface{}) string {
 	return weekday[which_week]
 }
 
-//Tag 数据标签
+// Tag 数据标签
 func Tag(i interface{}) string {
 	replacer := strings.NewReplacer(tagPatterns...)
 	format := ToString(i)
@@ -4541,7 +4543,7 @@ func UnescapeString(v interface{}) string {
 	return html.EscapeString(string(a))
 }
 
-//GetAppRootPath 获取应用程序根目录
+// GetAppRootPath 获取应用程序根目录
 func GetAppRootPath() string {
 	return GetParentDirectory(GetCurrentDirectory())
 }
@@ -4569,12 +4571,12 @@ func GetCurrentDirectory() string {
 	return strings.Replace(dir, "\\", "/", -1)
 }
 
-//Random 随机字符串
+// Random 随机字符串
 func Random() string {
 	return uuid.New().String() + strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
-//VerifyPhone 验证电话号码是否正确
+// VerifyPhone 验证电话号码是否正确
 func VerifyPhone(phone string) bool {
 	regular := "^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$"
 
@@ -4582,7 +4584,7 @@ func VerifyPhone(phone string) bool {
 	return reg.MatchString(phone)
 }
 
-//VerifyEmail 验证邮箱
+// VerifyEmail 验证邮箱
 func VerifyEmail(email string) bool {
 	//pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
 	pattern := `^[0-9a-z][_.0-9a-z-]{0,31}@([0-9a-z][0-9a-z-]{0,30}[0-9a-z]\.){1,4}[a-z]{2,4}$`
@@ -5255,7 +5257,7 @@ func RandPassword(length int) string {
 	return str
 }
 
-//StrToUnicode 字符串转unicode编码
+// StrToUnicode 字符串转unicode编码
 func StrToUnicode(str string) string {
 	finallStr := ""
 	for _, s := range str {
@@ -5270,7 +5272,7 @@ func StrToUnicode(str string) string {
 	return finallStr
 }
 
-//UnicodeToStr unicode编码转字符串
+// UnicodeToStr unicode编码转字符串
 func UnicodeToStr(uStr string) string {
 	uqStr, err := strconv.Unquote(strings.Replace(strconv.Quote(uStr), `\\u`, `\u`, -1))
 	if err != nil {
